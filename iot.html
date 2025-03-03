@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arduino Projects</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --primary: #95c11f;
+            --primary-dark: #7da019;
+            --secondary: #2c3e50;
+            --text-light: #f8f9fa;
+            --text-dark: #212529;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --anim-timing: 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* Particle background */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            z-index: -2;
+        }
+
+        body {
+            min-height: 100vh;
+            color: var(--text-light);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Dynamic background elements */
+        .bg-circle {
+            position: fixed;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary) 0%, rgba(149, 193, 31, 0) 70%);
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .bg-circle:nth-child(1) {
+            width: 800px;
+            height: 800px;
+            top: -400px;
+            left: -200px;
+            animation: float-circle 25s ease-in-out infinite alternate;
+        }
+
+        .bg-circle:nth-child(2) {
+            width: 600px;
+            height: 600px;
+            bottom: -300px;
+            right: -100px;
+            animation: float-circle 20s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes float-circle {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(100px, 50px);
+            }
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            padding: 0.7rem 5%;
+            background: rgba(0, 0, 0, 0.95);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(149, 193, 31, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled .logo {
+            width: 40px;
+            height: 40px;
+        }
+
+        .logo-text {
+            font-weight: 600;
+            font-size: 1.2rem;
+            display: inline-block;
+            background: linear-gradient(45deg, var(--primary), #ffffff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s;
+            position: relative;
+            padding: 0.5rem 0;
+            overflow: hidden;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--primary);
+            visibility: hidden;
+            transform: scaleX(0);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a:hover::before {
+            visibility: visible;
+            transform: scaleX(1);
+        }
+
+        /* Mobile menu button */
+        .menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        /* Header with animated text */
+        .hero-section {
+            height: 30vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s forwards 0.3s;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0.9;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s forwards 0.6s;
+        }
+
+        .hero-title span {
+            display: inline-block;
+            color: var(--primary);
+            position: relative;
+        }
+
+        .hero-title span::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            bottom: 5px;
+            left: 0;
+            background-color: var(--primary);
+            transform: scaleX(0);
+            transform-origin: left;
+            animation: lineExpand 1.5s forwards 1s;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes lineExpand {
+            to {
+                transform: scaleX(1);
+            }
+        }
+
+        /* Projects Container */
+        .projects-container {
+            display: flex;
+            justify-content: center;
+            gap: 2.5rem;
+            padding: 2rem 5% 6rem;
+            flex-wrap: wrap;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            perspective: 1000px;
+        }
+
+        .project-card {
+            width: 320px;
+            height: auto;
+            min-height: 450px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            transition: all var(--anim-timing);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transform: translateY(50px);
+            opacity: 0;
+            animation: fadeInCard 0.8s forwards;
+            animation-delay: calc(var(--index) * 0.2s);
+        }
+
+        .project-card:nth-child(1) { --index: 1; }
+        .project-card:nth-child(2) { --index: 2; }
+        .project-card:nth-child(3) { --index: 3; }
+        .project-card:nth-child(4) { --index: 4; }
+        .project-card:nth-child(5) { --index: 5; }
+        .project-card:nth-child(6) { --index: 6; }
+
+        @keyframes fadeInCard {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .project-card:hover {
+            transform: translateY(-15px) rotateY(5deg);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(149, 193, 31, 0.3);
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(149, 193, 31, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .project-card:hover::before {
+            opacity: 1;
+        }
+
+        .project-image {
+            width: 100%;
+            height: 220px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .project-image::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40%;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+            z-index: 1;
+        }
+
+        .project-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s ease;
+        }
+
+        .project-card:hover .project-image img {
+            transform: scale(1.1) rotate(2deg);
+        }
+
+        .project-content {
+            padding: 1.8rem;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 1.5rem;
+            background-color: white;
+            color: var(--text-dark);
+            position: relative;
+            z-index: 2;
+        }
+
+        .project-title {
+            font-size: 1.8rem;
+            color: var(--secondary);
+            position: relative;
+            padding-bottom: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-title::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 3px;
+            background: var(--primary);
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: width 0.3s ease;
+        }
+
+        .project-card:hover .project-title::after {
+            width: 100px;
+        }
+
+        .project-description {
+            font-size: 1rem;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .cta-button {
+            padding: 0.8rem 2.2rem;
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            margin-top: auto;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            box-shadow: 0 4px 15px rgba(149, 193, 31, 0.3);
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary-dark), var(--primary));
+            z-index: -1;
+            transition: transform 0.5s ease;
+            transform: scaleX(0);
+            transform-origin: right;
+        }
+
+        .cta-button:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .cta-button:hover {
+            box-shadow: 0 6px 20px rgba(149, 193, 31, 0.5);
+            transform: translateY(-3px);
+        }
+
+        /* Footer with animated background */
+        footer {
+            padding: 3rem 5% 2rem;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.8));
+            z-index: -1;
+        }
+
+        .footer-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .footer-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .copyright {
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: #777;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .projects-container {
+                gap: 1.5rem;
+            }
+            
+            .project-card {
+                width: 300px;
+            }
+            
+            .hero-title {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .projects-container {
+                padding: 3rem 3%;
+            }
+            
+            .project-card {
+                width: 280px;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .menu-btn {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 70%;
+                height: 100vh;
+                flex-direction: column;
+                background: rgba(0, 0, 0, 0.95);
+                padding: 5rem 2rem 2rem;
+                gap: 1.5rem;
+                transition: right 0.4s ease;
+                justify-content: flex-start;
+                align-items: center;
+            }
+
+            .nav-links.active {
+                right: 0;
+                display: flex;
+            }
+
+            .nav-links a {
+                padding: 1rem 0;
+                font-size: 1.2rem;
+                width: 100%;
+                text-align: center;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .projects-container {
+                padding: 2rem 1rem;
+            }
+
+            .project-card {
+                width: 100%;
+                max-width: 340px;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-section {
+                height: 30vh;
+            }
+        }
+
+        @media (max-width: 480px) {
+            nav {
+                padding: 1rem 3%;
+            }
+
+            .project-title {
+                font-size: 1.5rem;
+            }
+
+            .project-description {
+                font-size: 0.9rem;
+            }
+            
+            .hero-title {
+                font-size: 1.8rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .hero-section {
+                height: 25vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    <div class="bg-circle"></div>
+    <div class="bg-circle"></div>
+    
+    <nav id="main-nav">
+        <div class="logo-container">
+            <img src="logomain.png" alt="Logo" class="logo">
+            <span class="logo-text">Laksindu janith</span>
+        </div>
+        <button class="menu-btn">☰</button>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="Arduino.html">Arduino</a>
+            <a href="iot.html">IoT</a>
+            <a href="gsme.html">Electronics</a>
+            <a href="#">About me</a>
+        </div>
+    </nav>
+    
+    <div class="hero-section">
+        <h1 class="hero-title">IOT <span>Projects</span></h1>
+        <p class="hero-subtitle">Exploring the world of microcontrollers through innovative DIY projects</p>
+    </div>
+
+    <div class="projects-container">
+        <div class="project-card">
+            <div class="project-image">
+                <img src="rcrover.jpeg" alt="Arduino Project 1">
+            </div>
+            <div class="project-content">
+                <div>
+                    <h2 class="project-title">Smart extension cord with alexa</h2>
+                    <p class="project-description">Control two switches remotely with an ESP32-powered smart extension, seamlessly integrated with Alexa for voice command functionality. Ideal for home automation and smart device management.</p>
+                </div>
+                <a href="alexalitgh.html" class="cta-button">Learn More</a>
+            </div>
+        </div>
+
+        <div class="project-card">
+            <div class="project-image">
+                <img src="cnc.jpeg" alt="Arduino Project 2">
+            </div>
+            <div class="project-content">
+                <div>
+                    <h2 class="project-title">Arduino CNC Printer</h2>
+                    <p class="project-description">An Arduino CNC printer that automates engraving and cutting with precision control. Create intricate designs with this versatile machine.</p>
+                </div>
+                <a href="Cnc.html" class="cta-button">Learn More</a>
+            </div>
+        </div>
+
+        <div class="project-card">
+            <div class="project-image">
+                <img src="WhatsApp Image 2025-02-22 at 18.44.47.jpeg" alt="Arduino Project 3">
+            </div>
+            <div class="project-content">
+                <div>
+                    <h2 class="project-title">UnoJoy Game Controller</h2>
+                    <p class="project-description">Control your game using an Arduino Uno-powered joystick controller for seamless gameplay. Customize inputs for your favorite games.</p>
+                </div>
+                <a href="game.html" class="cta-button">Learn More</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-bg"></div>
+        <div class="footer-content">
+            <h3 class="footer-title">IOT Projects Gallery</h3>
+            <div class="copyright">© 2025 TechFolio. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Particles background
+        particlesJS("particles-js", {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#95c11f" },
+                shape: {
+                    type: "circle",
+                    stroke: { width: 0, color: "#000000" },
+                },
+                opacity: {
+                    value: 0.5,
+                    random: true,
+                    anim: { enable: true, speed: 1, opacity_min: 0.1, sync: false }
+                },
+                size: {
+                    value: 3,
+                    random: true,
+                    anim: { enable: true, speed: 2, size_min: 0.1, sync: false }
+                },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#95c11f",
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 1,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false,
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "grab" },
+                    onclick: { enable: true, mode: "push" },
+                    resize: true
+                },
+                modes: {
+                    grab: { distance: 140, line_linked: { opacity: 1 } },
+                    bubble: { distance: 400, size: 40, duration: 2, opacity: 8 },
+                    repulse: { distance: 200, duration: 0.4 },
+                    push: { particles_nb: 4 },
+                    remove: { particles_nb: 2 }
+                }
+            },
+            retina_detect: true
+        });
+
+        // Scroll animation for navbar
+        const nav = document.getElementById('main-nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+        
+        // Mobile menu toggle
+        const menuBtn = document.querySelector('.menu-btn');
+        const navLinks = document.querySelector('.nav-links');
+        
+        menuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.nav-links') && !e.target.closest('.menu-btn') && navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+            }
+        });
+        
+        // Card scroll reveal animation
+        const cards = document.querySelectorAll('.project-card');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        cards.forEach(card => {
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>

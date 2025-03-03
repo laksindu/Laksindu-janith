@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart switch</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0a0e1f;
+            color: white;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Background Animation */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.2;
+            overflow: hidden;
+        }
+
+        .node {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #95c11f;
+            border-radius: 50%;
+        }
+
+        .line {
+            position: absolute;
+            height: 1px;
+            background: rgba(149, 193, 31, 0.3);
+            transform-origin: left center;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            background: rgba(10, 14, 31, 0.9);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #95c11f;
+        }
+
+        .back-btn {
+            padding: 0.5rem 1rem;
+            background: #95c11f;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #7da019;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(149, 193, 31, 0.4);
+        }
+
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: 2rem auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 1s ease-in-out;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .image-section {
+            flex: 1;
+            position: relative;
+            min-height: 400px;
+            overflow: hidden;
+        }
+
+        .slider {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .slider img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .slider img:hover {
+            transform: scale(1.05);
+        }
+
+        .arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(149, 193, 31, 0.7);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s, transform 0.3s;
+            z-index: 10;
+        }
+
+        .arrow:hover {
+            background: #95c11f;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .prev {
+            left: 10px;
+        }
+
+        .next {
+            right: 10px;
+        }
+
+        .content {
+            flex: 1;
+            padding: 40px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: white;
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 50%;
+            height: 3px;
+            background: #95c11f;
+            animation: underlineAnimation 3s ease-in-out infinite;
+        }
+
+        @keyframes underlineAnimation {
+            0% { width: 0; left: 0; }
+            50% { width: 100%; left: 0; }
+            100% { width: 0; left: 100%; }
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            color: #95c11f;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 1rem;
+            color: #ccc;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .download-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #95c11f;
+            color: white;
+            font-size: 1rem;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: transform 0.5s;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(149, 193, 31, 0.4);
+            background: #7da019;
+        }
+
+        .download-btn:hover::before {
+            transform: translateX(100%);
+        }
+
+        .video-section {
+            margin-top: 30px;
+        }
+
+        .video-section h2 {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        .video-section video {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideLeft {
+            from { transform: translateX(-50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideRight {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .slide-left {
+            animation: slideLeft 1s ease-out;
+        }
+
+        .slide-right {
+            animation: slideRight 1s ease-out;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                margin: 1rem;
+            }
+            .image-section {
+                height: 300px;
+            }
+            .content {
+                padding: 20px;
+            }
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation" id="bg-animation"></div>
+
+    <nav class="nav">
+        <img src="logomain.png" alt="Logo" class="logo">
+        <div class="nav-links">
+            <a href="home.html" class="nav-link">Home</a>
+            <a href="arduino.html" class="nav-link">Arduino</a>
+            <a href="iot.html" class="nav-link">IoT</a>
+            <a href="electronics.html" class="nav-link">Electronics</a>
+            <a href="about.html" class="nav-link">About me</a>
+        </div>
+        <a href="iot.html" class="back-btn">Back</a>
+    </nav>
+
+    <div class="container">
+        <div class="image-section slide-left">
+            <button class="arrow prev" onclick="prevSlide()">&#10094;</button>
+            <div class="slider">
+                <img src="WhatsApp Image 2025-02-22 at 18.44.47.jpeg" alt="Cnc Image 1">
+                <img src="cnc2.jpeg" alt="Cnc Image 2">
+                <img src="rcrover3.jpeg" alt="Cnc Image 3">
+            </div>
+            <button class="arrow next" onclick="nextSlide()">&#10095;</button>
+        </div>
+        <div class="content slide-right">
+            <h1>Smart extension cord with alexa</h1>
+            <h2>Project Overview</h2>
+            <p>This Smart Extension is built using an ESP32, enabling seamless control of two switches via Alexa integration. The ESP32 is programmed to connect with Alexa, allowing users to control connected devices with simple voice commands. This project showcases how an ESP32 can be leveraged to create a smart home solution, with the flexibility to manage switches remotely through an easy-to-use voice assistant interface. By combining IoT technology with Alexa, this project offers a simple and effective way to automate home appliances and elevate user convenience.</p>
+            <p>You can download the project's files from here:</p>
+            <a href="#" class="download-btn">Download Project Files</a>
+            
+            <div class="video-section">
+                <h2>Project Demo</h2>
+                <video controls>
+                    <source src="alexalight.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Slider functionality
+        let currentSlide = 0;
+        const slides = document.querySelectorAll(".slider img");
+        
+        function showSlide(index) {
+            slides.forEach((img, i) => {
+                img.style.display = i === index ? "block" : "none";
+            });
+        }
+        
+        function prevSlide() {
+            currentSlide = (currentSlide > 0) ? currentSlide - 1 : slides.length - 1;
+            showSlide(currentSlide);
+        }
+        
+        function nextSlide() {
+            currentSlide = (currentSlide < slides.length - 1) ? currentSlide + 1 : 0;
+            showSlide(currentSlide);
+        }
+        
+        // Initialize slider
+        showSlide(currentSlide);
+        
+        // Background network animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const bgAnimation = document.getElementById('bg-animation');
+            const nodes = [];
+            const lines = [];
+            const nodeCount = 20;
+            
+            // Create nodes
+            for (let i = 0; i < nodeCount; i++) {
+                const node = document.createElement('div');
+                node.className = 'node';
+                
+                // Random position
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight;
+                
+                node.style.left = `${x}px`;
+                node.style.top = `${y}px`;
+                
+                // Add velocity
+                node.vx = (Math.random() - 0.5) * 0.5;
+                node.vy = (Math.random() - 0.5) * 0.5;
+                
+                bgAnimation.appendChild(node);
+                nodes.push(node);
+            }
+            
+            // Create lines between nodes
+            function createLines() {
+                // Clear previous lines
+                lines.forEach(line => line.remove());
+                lines.length = 0;
+                
+                for (let i = 0; i < nodes.length; i++) {
+                    const nodeA = nodes[i];
+                    const nodeAX = parseFloat(nodeA.style.left);
+                    const nodeAY = parseFloat(nodeA.style.top);
+                    
+                    for (let j = i + 1; j < nodes.length; j++) {
+                        const nodeB = nodes[j];
+                        const nodeBX = parseFloat(nodeB.style.left);
+                        const nodeBY = parseFloat(nodeB.style.top);
+                        
+                        // Calculate distance
+                        const dx = nodeBX - nodeAX;
+                        const dy = nodeBY - nodeAY;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        // Only create lines for nodes that are close enough
+                        if (distance < 200) {
+                            const line = document.createElement('div');
+                            line.className = 'line';
+                            
+                            // Set position and dimensions
+                            line.style.left = `${nodeAX + 3}px`;
+                            line.style.top = `${nodeAY + 3}px`;
+                            line.style.width = `${distance}px`;
+                            line.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`;
+                            
+                            // Make far lines more transparent
+                            line.style.opacity = 1 - distance / 200;
+                            
+                            bgAnimation.appendChild(line);
+                            lines.push(line);
+                        }
+                    }
+                }
+            }
+            
+            // Animation loop
+            function animate() {
+                nodes.forEach(node => {
+                    // Get current position
+                    let x = parseFloat(node.style.left);
+                    let y = parseFloat(node.style.top);
+                    
+                    // Update position
+                    x += node.vx;
+                    y += node.vy;
+                    
+                    // Bounce off edges
+                    if (x <= 0 || x >= window.innerWidth - 6) {
+                        node.vx *= -1;
+                        x = Math.max(0, Math.min(x, window.innerWidth - 6));
+                    }
+                    
+                    if (y <= 0 || y >= window.innerHeight - 6) {
+                        node.vy *= -1;
+                        y = Math.max(0, Math.min(y, window.innerHeight - 6));
+                    }
+                    
+                    // Apply new position
+                    node.style.left = `${x}px`;
+                    node.style.top = `${y}px`;
+                });
+                
+                // Update lines
+                createLines();
+                
+                requestAnimationFrame(animate);
+            }
+            
+            // Start animation
+            animate();
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                nodes.forEach(node => {
+                    // Keep nodes within viewport when resizing
+                    let x = parseFloat(node.style.left);
+                    let y = parseFloat(node.style.top);
+                    
+                    x = Math.min(x, window.innerWidth - 6);
+                    y = Math.min(y, window.innerHeight - 6);
+                    
+                    node.style.left = `${x}px`;
+                    node.style.top = `${y}px`;
+                });
+            });
+        });
+    </script>
+</body>
+</html>
